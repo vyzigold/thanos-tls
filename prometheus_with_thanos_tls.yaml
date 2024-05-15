@@ -1,0 +1,161 @@
+apiVersion: monitoring.rhobs/v1
+kind: Prometheus
+metadata:
+  creationTimestamp: "2024-05-15T06:19:58Z"
+  generation: 12
+  labels:
+    app.kubernetes.io/managed-by: observability-operator
+    app.kubernetes.io/name: metric-storage
+    app.kubernetes.io/part-of: metric-storage
+  name: metric-storage
+  namespace: openstack
+  ownerReferences:
+  - apiVersion: monitoring.rhobs/v1alpha1
+    blockOwnerDeletion: true
+    controller: true
+    kind: MonitoringStack
+    name: metric-storage
+    uid: 889bd415-3fea-4441-8fc8-5c67f6d3531c
+  resourceVersion: "435759"
+  uid: 906b487f-e5e5-4fa6-8de8-c24c4f7342f5
+spec:
+  additionalScrapeConfigs:
+    key: self-scrape-config
+    name: metric-storage-prometheus-additional-scrape-configs
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchLabels:
+            app.kubernetes.io/component: prometheus
+            app.kubernetes.io/part-of: metric-storage
+        topologyKey: kubernetes.io/hostname
+  alerting:
+    alertmanagers:
+    - apiVersion: v2
+      name: metric-storage-alertmanager
+      namespace: openstack
+      port: web
+      scheme: http
+  arbitraryFSAccessThroughSMs: {}
+  evaluationInterval: 30s
+  image: registry.redhat.io/cluster-observability-operator/coo-prometheus-rhel8@sha256:6bbb1aebb1cfdc3310e398ec7720ca1d4a9a89cecf7406412071bfaceb0d3cb3
+  logLevel: info
+  podMetadata:
+    labels:
+      app.kubernetes.io/component: prometheus
+      app.kubernetes.io/part-of: metric-storage
+  podMonitorSelector:
+    matchLabels:
+      service: metricStorage
+  portName: web
+  probeSelector:
+    matchLabels:
+      service: metricStorage
+  replicas: 1
+  resources: {}
+  retention: 24h
+  ruleSelector:
+    matchLabels:
+      service: metricStorage
+  rules:
+    alert: {}
+  scrapeConfigSelector:
+    matchLabels:
+      service: metricStorage
+  scrapeInterval: 200s
+  secrets:
+  - combined-ca-bundle
+  securityContext:
+    fsGroup: 65534
+    runAsNonRoot: true
+    runAsUser: 65534
+  serviceAccountName: metric-storage-prometheus
+  serviceMonitorSelector:
+    matchLabels:
+      service: metricStorage
+  storage:
+    volumeClaimTemplate:
+      metadata: {}
+      spec:
+        resources:
+          requests:
+            storage: 20G
+      status: {}
+  thanos:
+    blockSize: 2h
+    grpcServerTlsConfig:
+      certFile: /certs/cert/cert
+      keyFile: /certs/key/key
+    image: registry.redhat.io/cluster-observability-operator/coo-thanos-rhel8@sha256:09eab2acb7ea4241a4c60cf134c10f1250b772967dc6c495bc91653f4de1deeb
+    resources: {}
+    volumeMounts:
+    - mountPath: /certs/ca
+      name: ca
+      readOnly: true
+    - mountPath: /certs/key
+      name: key
+      readOnly: true
+    - mountPath: /certs/cert
+      name: cert
+      readOnly: true
+  tsdb: {}
+  volumes:
+  - name: ca
+    secret:
+      defaultMode: 420
+      items:
+      - key: ca.crt
+        path: ca
+      secretName: cert-thanos-sidecar-svc
+  - name: key
+    secret:
+      defaultMode: 420
+      items:
+      - key: tls.key
+        path: key
+      secretName: cert-thanos-sidecar-svc
+  - name: cert
+    secret:
+      defaultMode: 420
+      items:
+      - key: tls.crt
+        path: cert
+      secretName: cert-thanos-sidecar-svc
+  web:
+    tlsConfig:
+      cert:
+        secret:
+          key: tls.crt
+          name: cert-metric-storage-prometheus-svc
+      client_ca: {}
+      keySecret:
+        key: tls.key
+        name: cert-metric-storage-prometheus-svc
+status:
+  availableReplicas: 1
+  conditions:
+  - lastTransitionTime: "2024-05-15T13:20:35Z"
+    message: ""
+    observedGeneration: 12
+    reason: ""
+    status: "True"
+    type: Available
+  - lastTransitionTime: "2024-05-15T13:20:35Z"
+    message: ""
+    observedGeneration: 12
+    reason: ""
+    status: "True"
+    type: Reconciled
+  paused: false
+  replicas: 1
+  selector: app.kubernetes.io/instance=metric-storage,app.kubernetes.io/managed-by=prometheus-operator,app.kubernetes.io/name=prometheus,operator.prometheus.io/name=metric-storage,prometheus=metric-storage
+  shardStatuses:
+  - availableReplicas: 1
+    replicas: 1
+    shardID: "0"
+    unavailableReplicas: 0
+    updatedReplicas: 1
+  shards: 1
+  unavailableReplicas: 0
+  updatedReplicas: 1

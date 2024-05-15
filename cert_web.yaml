@@ -1,0 +1,20 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: thanos-querier-svc
+  namespace: openstack
+spec:
+  dnsNames:
+  - thanos-querier-example-thanos.openstack.svc
+  - thanos-querier-example-thanos.openstack.svc.cluster.local
+  duration: 10950h0m0s
+  issuerRef:
+    group: cert-manager.io
+    kind: Issuer
+    name: rootca-internal
+  secretName: cert-thanos-querier-svc
+  secretTemplate: {}
+  usages:
+  - key encipherment
+  - digital signature
+  - server auth
